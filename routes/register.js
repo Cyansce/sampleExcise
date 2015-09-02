@@ -10,3 +10,7 @@ router.get('/', function(req, res) {
         title: 'Register'
     });
 });
+
+router.post('/', function(req, res){
+	
+});
