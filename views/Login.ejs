@@ -1,0 +1,91 @@
+<div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	<h4 class="modal-title" id="myModalLabel"><%= title %></h4>
+</div>
+<div class="modal-body">
+   <% if (locals.success) { %> 
+      <div id="alt_sucess" class="alert alert-success"> 
+        <%- success %> 
+      </div> 
+   <% } %> 
+
+  <% if (locals.error) { %> 
+    <div id="alt_warning" class="alert alert-warning"> 
+      <%= error %> 
+    </div> 
+  <% } %> 
+
+  <form class="form-signin" role="form" method="post">
+    <input id="txtUserName" name="txtUserName" type="text" class="form-control" placeholder="用户名/邮箱" required autofocus />
+    <input id="txtUserPwd" name="txtUserPwd" type="password" class="form-control" placeholder="密码" required/>
+    <div class="checkbox"><label><input type="checkbox" id="rem" />Remember Password</label></div>
+  </form>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" id="forgetPassword">Forget Password</button>
+	<button type="button" class="btn btn-primary" id="loginPost">LOG IN</button>
+</div>
+
+<script type="text/javascript">
+	String.prototype.format = function(args){
+		var result = this;
+		if(arguments.length > 0){
+			if(arguments.lenght == 1 && typeof(args) == "object"){
+				for(var key in args){
+					if(args[key] != undefined){
+						var reg = new RegExp("({"+key+"})","g");
+						result = result.replace(reg,args[key]);
+					}
+				}
+			}else{
+				for(var i =0;i<arguments.length;i++){
+					if(arguments[i] != undefined){
+						var reg = new RegExp("({)"+i+"(})","g");
+						result = result.replace(reg, arguments[i]);
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	$(function(){
+		$("#loginPost").click(function(){
+			var $username = $("#txtUserName");
+			var username = $username.val();
+			var $password = $("#txtUserPwd");
+			var password = $password.val();
+			var rem = $("#rem").is(":checked");
+
+			var msg = "<div id='errorTip' class='alert alert-warning'>{0}</div>";
+			$("#errorTip").remove();
+			
+			if(username.length == 0){
+				$(".form-signin").prepend(msg.format('用户名不能为空'));
+				$username.focus();
+				return false;
+			}
+
+			if(password.length == 0){
+				$(".form-signin").prepend(msg.format('密码不能为空'));
+				$password.focus();
+				return false;
+			}
+
+
+			$.ajax({
+				url:'/login',
+				type:'post',
+				data:{"username":username,"password":password,"rem":rem},
+				dataType:'json',
+				success:function(data){
+					if(!data.status){
+						$(".form-signin").prepend(msg.format(data.msg));
+						$username.focus();
+						return false;
+					}
+				}
+			});
+		});
+	});
+</script>
